@@ -1,6 +1,8 @@
 (function (doc, win) {
 	'use strict';
 
+	let $;
+
 	helpers: {
 		// ES6 `Array.from` polyfill
 		if (!Array.from) {
@@ -17,7 +19,7 @@
 		}
 
 		// universal query selector
-		var $ = function (selector, root = document) {
+		$ = function (selector, root = document) {
 			if (selector) {
 				let elements = root.querySelectorAll(selector);
 				return (elements.length === 1) ?
@@ -37,17 +39,17 @@
 				{
 					id: 0,
 					name: 'pomodoro',
-					length: [25, 0]
+					duration: [25, 0]
 				},
 				{
 					id: 1,
 					name: 'short break',
-					length: [5, 0]
+					duration: [5, 0]
 				},
 				{
 					id: 2,
 					name: 'long break',
-					length: [20, 0]
+					duration: [20, 0]
 				}
 			],
 			lastId: 2,
@@ -78,7 +80,12 @@
 		// methods
 		////////////////////////
 		let setCurrentTimer = function (timerId, callback) {
-			data.currentTimerId = parseInt(timerId, 10);
+			// TODO: validate timerId
+			let timerIdNum = parseInt(timerId, 10);
+			let currentTimer = data.timers.find(timer => timer.id === timerIdNum);
+
+			data.currentTimerId = timerIdNum;
+			data.currentTimer = Object.assign({}, currentTimer);
 
 			if (callback) {
 				callback();
@@ -104,7 +111,7 @@
 			if (currentTimer) {
 				// set name and time to currentTimer's ones
 				elems.mainTimer.name.textContent = currentTimer.name;
-				elems.mainTimer.time.textContent = `${currentTimer.length[0] || '00'}:${currentTimer.length[1] || '00'}`;
+				elems.mainTimer.time.textContent = `${currentTimer.duration[0] || '00'}:${currentTimer.duration[1] || '00'}`;
 			} else {
 				// display error
 				// TODO: throw error
@@ -123,7 +130,7 @@
 
 			// set inner element's text
 			// example: `pomodoro (25:00)`
-			button.textContent = `${item.name} (${item.length[0] || '00'}:${item.length[1] || '00'})`;
+			button.textContent = `${item.name} (${item.duration[0] || '00'}:${item.duration[1] || '00'})`;
 
 			// append inner element to the outer one, and outer one to the
 			// container
