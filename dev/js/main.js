@@ -2,13 +2,21 @@
 	'use strict';
 
 	helpers: {
-		// ES6 `Array.from()` polyfill
-		if (!Array.prototype.from) {
-			Array.prototype.from = function (pseudoArray) {
+		// ES6 `Array.from` polyfill
+		if (!Array.from) {
+			Array.from = function (pseudoArray) {
 				return Array.prototype.slice.call(pseudoArray);
 			};
 		}
 
+		// `Array.prototype.find` polyfill
+		if (!Array.prototype.find) {
+			Array.prototype.find = function (filterFunc) {
+				return this.filter(filterFunc)[0];
+			};
+		}
+
+		// universal query selector
 		var $ = function (selector, root = document) {
 			if (selector) {
 				let elements = root.querySelectorAll(selector);
