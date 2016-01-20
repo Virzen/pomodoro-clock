@@ -9,7 +9,7 @@
 			};
 		}
 
-		// `Array.prototype.find` polyfill
+		// ES6 `Array.prototype.find` polyfill
 		if (!Array.prototype.find) {
 			Array.prototype.find = function (filterFunc) {
 				return this.filter(filterFunc)[0];
