@@ -76,8 +76,12 @@
 		};
 
 		// methods
-		let setCurrentTimer = function (timerId, callback = renderTimer) {
+		let setCurrentTimer = function (timerId, callback) {
+			data.currentTimerId = parseInt(timerId, 10);
 
+			if (callback) {
+				callback();
+			}
 		};
 
 		let startTimer = function (timerId = data.currentTimerId) {
@@ -92,8 +96,19 @@
 
 		};
 
-		let renderTimer = function (timerId = data.currentTimerId) {
+		let renderMainTimer = function (timerId = data.currentTimerId) {
+			// search for timer object with given id
+			let currentTimer = data.timers.find(timer => timer.id === timerId);
 
+			if (currentTimer) {
+				// set name and time to currentTimer's ones
+				elems.mainTimer.name.textContent = currentTimer.name;
+				elems.mainTimer.time.textContent = `${currentTimer.length[0] || '00'}:${currentTimer.length[1] || '00'}`;
+			} else {
+				// display error
+				// TODO: throw error
+				console.error(`Timer with given id doesn't exist.`);
+			}
 		};
 
 		let renderTimersListItem = function (item) {
@@ -130,7 +145,20 @@
 			elems.buttons.reset.addEventListener('click', () => {resetTimer();}, false);
 
 			// render timers list from stored data
+			// it also adds each element to elems.timers, so it's necessary for
+			// the next step
 			renderTimersList();
+
+			// call setCurrentTimer on click on timers list's element and use
+			// its data-timer-id as timer's id
+			elems.timers.forEach(timer => {
+				timer.addEventListener('click', ev => {
+					setCurrentTimer(ev.target.dataset.timerId, renderMainTimer);
+				});
+			});
+
+			// trigger initial rendering of main timer
+			renderMainTimer();
 
 		};
 
