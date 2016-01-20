@@ -55,23 +55,95 @@
 			currentTimerId: 0,
 		};
 
+		// DOM elements
+		// containers
 		let appBody = $('.app-body');
+		let timer = $('.timer', appBody);
+		let timersList = $('.timers-list', appBody);
+
+		// elements
 		let elems = {
-			timer: $('.timer', appBody),
-			timersList: $('.timers-list', appBody),
-			buttons: {
-				start: $('start-button', appBody),
-				stop: $('stop-button', appBody),
-				reset: $('reset-button', appBody),
+			mainTimer: {
+				name: $('.timer__name', timer),
+				time: $('.timer__time', timer),
 			},
+			buttons: {
+				start: $('.start-button', appBody),
+				stop: $('.stop-button', appBody),
+				reset: $('.reset-button', appBody),
+			},
+			timers: [],
+		};
+
+		// methods
+		let setCurrentTimer = function (timerId, callback = renderTimer) {
+
+		};
+
+		let startTimer = function (timerId = data.currentTimerId) {
+
+		};
+
+		let stopTimer = function (timerId = data.currentTimerId) {
+
+		};
+
+		let resetTimer = function (timerId = data.currentTimerId) {
+
+		};
+
+		let renderTimer = function (timerId = data.currentTimerId) {
+
+		};
+
+		let renderTimersListItem = function (item) {
+			// create dom elements
+			let li = doc.createElement('li');
+			let button = doc.createElement('button');
+
+			// add class and data value to the inner element
+			button.classList.add('timers-list__item');
+			button.dataset.timerId = item.id;
+
+			// set inner element's text
+			// example: `pomodoro (25:00)`
+			button.textContent = `${item.name} (${item.length[0] || '00'}:${item.length[1] || '00'})`;
+
+			// append inner element to the outer one, and outer one to the
+			// container
+			li.appendChild(button);
+			timersList.appendChild(li);
+
+			// add button to the elems object
+			// FIXME: refactor this to callback passed as argument
+			elems.timers.push(button);
+		};
+
+		let renderTimersList = function () {
+			data.timers.forEach(renderTimersListItem);
+		};
+
+		let init = function () {
+			// attach event listeners to clock controls
+			elems.buttons.start.addEventListener('click', () => {startTimer();}, false);
+			elems.buttons.stop.addEventListener('click', () => {stopTimer();}, false);
+			elems.buttons.reset.addEventListener('click', () => {resetTimer();}, false);
+
+			// render timers list from stored data
+			renderTimersList();
+
 		};
 
 
 		// public part
 		return {
-
+			data: data,
+			elems: elems,
+			init: init,
 		};
 	}());
 
 	win.app = app;
 })(document, window);
+
+app.init();
