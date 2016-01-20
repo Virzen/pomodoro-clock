@@ -32,7 +32,6 @@
 
 	// application's singleton
 	let app = (function () {
-		// private part
 		let data = {
 			timers: [
 				{
@@ -56,6 +55,7 @@
 		};
 
 		// DOM elements
+		////////////////////////
 		// containers
 		let appBody = $('.app-body');
 		let timer = $('.timer', appBody);
@@ -76,6 +76,7 @@
 		};
 
 		// methods
+		////////////////////////
 		let setCurrentTimer = function (timerId, callback) {
 			data.currentTimerId = parseInt(timerId, 10);
 
@@ -164,6 +165,7 @@
 
 
 		// public part
+		////////////////////////
 		return {
 			data: data,
 			elems: elems,
