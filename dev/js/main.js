@@ -53,7 +53,9 @@
 				}
 			],
 			lastId: 2,
-			currentTimerId: 0,
+			currentTimer: null,
+			currentTimerId: null,
+			currentTimerInterval: null,
 		};
 
 		// DOM elements
@@ -106,12 +108,16 @@
 
 		let renderMainTimer = function (timerId = data.currentTimerId) {
 			// search for timer object with given id
-			let currentTimer = data.timers.find(timer => timer.id === timerId);
+			let currentTimer = currentTimer ||
+					data.timers.find(timer => timer.id === timerId);
 
 			if (currentTimer) {
 				// set name and time to currentTimer's ones
 				elems.mainTimer.name.textContent = currentTimer.name;
-				elems.mainTimer.time.textContent = `${currentTimer.duration[0] || '00'}:${currentTimer.duration[1] || '00'}`;
+				elems.mainTimer.time.textContent =
+					`${currentTimer.duration[0] || '00'}:
+					${currentTimer.duration[1] || '00'}`;
+
 			} else {
 				// display error
 				// TODO: throw error
@@ -165,8 +171,9 @@
 				});
 			});
 
-			// trigger initial rendering of main timer
-			renderMainTimer();
+			// set default timer as current one and trigger initial rendering
+			// of main timer
+			setCurrentTimer(0, renderMainTimer)
 
 		};
 
