@@ -60,7 +60,8 @@
 			timer: $('.timer', appBody),
 			timersList: $('.timers-list', appBody),
 			buttons: {
-				startStop: $('start-stop-button', appBody),
+				start: $('start-button', appBody),
+				stop: $('stop-button', appBody),
 				reset: $('reset-button', appBody),
 			},
 		};
