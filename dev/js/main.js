@@ -1,8 +1,8 @@
 (function (doc, win) {
 	'use strict';
 
+	// helper functions and polyfills
 	let $;
-
 	helpers: {
 		// ES6 `Array.from` polyfill
 		if (!Array.from) {
@@ -34,6 +34,10 @@
 
 	// application's singleton
 	let app = (function () {
+		// app's model
+		// an idea of this object is to be as independent as possible
+		// it might be fetched through ajax or localStorage, so it should be
+		// JSON compatible (e. g. no methods)
 		let data = {
 			timers: [
 				{
@@ -55,22 +59,38 @@
 			lastId: 2,
 		};
 
+		// state contains application-specific version of the data
+		// that might mean objects from data with some added methods
+		// it might synchronize raw data with model
 		let state = {
-			currentTimer: null
+			timers: null
 		};
+
+		// timer object contructor
+		// it attaches few methods and properties to objects from model, making
+		// it easier to operate application
+		let timer = function () {
+			let that;
+
+
+
+			return that;
+		};
+
+
 
 		// DOM elements
 		////////////////////////
 		// containers
 		let appBody = $('.app-body');
-		let timer = $('.timer', appBody);
+		let mainTimer = $('.timer', appBody);
 		let timersList = $('.timers-list', appBody);
 
 		// elements
 		let elems = {
 			mainTimer: {
-				name: $('.timer__name', timer),
-				time: $('.timer__time', timer),
+				name: $('.timer__name', mainTimer),
+				time: $('.timer__time', mainTimer),
 			},
 			buttons: {
 				start: $('.start-button', appBody),
