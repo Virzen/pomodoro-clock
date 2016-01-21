@@ -1,7 +1,7 @@
 (function (doc, win) {
 	'use strict';
 
-	// helper functions and polyfills
+	// Helper functions and polyfills
 	let $;
 	helpers: {
 		// ES6 `Array.from` polyfill
@@ -34,43 +34,78 @@
 
 	// application's singleton
 	let app = (function () {
-		// app's model
-		// an idea of this object is to be as independent as possible
-		// it might be fetched through ajax or localStorage, so it should be
+		// Spp's model
+		// An idea of this object is to be as independent as possible
+		// It might be fetched through ajax or localStorage, so it should be
 		// JSON compatible (e. g. no methods)
 		let data = {
 			timers: [
 				{
-					id: 0,
 					name: 'pomodoro',
 					duration: [25, 0]
 				},
 				{
-					id: 1,
 					name: 'short break',
 					duration: [5, 0]
 				},
 				{
-					id: 2,
 					name: 'long break',
 					duration: [20, 0]
 				}
 			],
-			lastId: 2,
 		};
 
-		// state contains application-specific version of the data
-		// that might mean objects from data with some added methods
-		// it might synchronize raw data with model
-		let state = {
-			timers: null
-		};
+		// State contains application-specific version of the data
+		// That might mean objects from data with some added methods
+		// Tt might synchronize raw data with model
+		// It is initialized in init function
+		let state = {};
 
-		// timer object contructor
-		// it attaches few methods and properties to objects from model, making
+		// Timer object contructor
+		// Tt attaches few methods and properties to objects from model, making
 		// it easier to operate application
-		let timer = function () {
-			let that;
+		// It is called in init function on all timers in model
+		let timer = function (spec) {
+			let that = {};
+
+			// Object methods declaration
+			// They will be attached to output object later
+			// See: 'revealing module pattern'
+
+			// Decrements timer's duration by one second at a time
+			let decrementDuration = function () {
+				// reverse array for easier access
+				let arr = this.duration.reverse();
+				let len = arr.length;
+
+				// TODO: validate durArr
+
+				// iterate through values in array
+				for (let i = 0; i < len; i++) {
+					// if current value (secs, mins, hours etc.) can be
+					// lowered, do it and return
+					if (arr[i] > 0) {
+						arr[i] -= 1;
+						this.duration = arr.reverse();
+						return true;
+					}
+					// if it can't be lowered, see if the next one can
+					// if so, set current one to 59 and let the loop decrement
+					// next one in the next step
+					else if (arr[i + 1] && arr[i + 1] > 0) {
+						arr[i] = 59;
+					}
+				}
+
+				// this means no value was lowered, none of the values is > 0
+				return false;
+			};
+
+
+
+			that.name = spec.name;
+			that.duration = spec.duration;
+			that.decrementDuration = decrementDuration;
 
 
 
@@ -81,12 +116,12 @@
 
 		// DOM elements
 		////////////////////////
-		// containers
+		// Containers
 		let appBody = $('.app-body');
 		let mainTimer = $('.timer', appBody);
 		let timersList = $('.timers-list', appBody);
 
-		// elements
+		// Elements
 		let elems = {
 			mainTimer: {
 				name: $('.timer__name', mainTimer),
@@ -102,38 +137,7 @@
 
 		// controller
 		////////////////////////
-		let decrementDuration = function (durArr) {
-			// reverse array for easier access
-			let revArr = durArr.reverse();
-			let len = revArr.length;
 
-			// TODO: validate durArr
-
-			// iterate through values in array
-			for (let i = 0; i < len; i++) {
-				// if current cell value (secs, mins, hours etc.) can be
-				// lowered, do it and return
-				if (revArr[i] > 0) {
-					revArr[i] -= 1;
-					durArr = revArr.reverse();
-					return true;
-				}
-				// if it can't be lowered, see if the next one can
-				// if so, set current one to 59 and let the loop decrement
-				// next one in the next step
-				else if (revArr[i + 1] && revArr[i + 1] > 0) {
-					revArr[i] = 59;
-				}
-			}
-
-			// this means no value was lowered, none of the values is > 0
-			return false;
-		};
-
-		// TODO: Implement real signalization for timer end
-		let signalizeTimerEnd = function () {
-			alert('Timer ended!');
-		};
 
 		let setCurrentTimer = function (timerId, callback = renderMainTimer) {
 			// TODO: validate timerId
@@ -254,6 +258,11 @@
 			data.timers.forEach(renderTimersListItem);
 		};
 
+		// TODO: Implement real signalization for timer end
+		let signalizeTimerEnd = function () {
+			alert('Timer ended!');
+		};
+
 		let init = function () {
 			// attach event listeners to clock controls
 			elems.buttons.start.addEventListener('click', () => {startTimer();}, false);
@@ -285,6 +294,7 @@
 		return {
 			data: data,
 			elems: elems,
+			timer: timer,
 			init: init,
 		};
 	}());
