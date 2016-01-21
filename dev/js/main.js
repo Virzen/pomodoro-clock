@@ -89,17 +89,24 @@
 
 			// TODO: validate durArr
 
+			// iterate through values in array
 			for (let i = 0; i < len; i++) {
+				// if current cell value (secs, mins, hours etc.) can be
+				// lowered, do it and return
 				if (revArr[i] > 0) {
 					revArr[i] -= 1;
 					durArr = revArr.reverse();
 					return true;
 				}
+				// if it can't be lowered, see if the next one can
+				// if so, set current one to 59 and let the loop decrement
+				// next one in the next step
 				else if (revArr[i + 1] && revArr[i + 1] > 0) {
 					revArr[i] = 59;
 				}
 			}
 
+			// this means no value was lowered, none of the values is > 0
 			return false;
 		};
 
@@ -128,8 +135,8 @@
 			}
 		};
 
+		// stop current timer by clearing its interval
 		let stopTimer = function () {
-			// stop current timer by clearing its interval
 			if (state.currentTimer.interval) {
 				clearInterval(state.currentTimer.interval);
 			}
@@ -181,11 +188,19 @@
 					data.timers.find(timer => timer.id === timerId);
 
 			if (currentTimer) {
+				let name = currentTimer.name;
+
+				// turn numbers into strings and make all of them at least
+				// 2 digits long (e. g. 2 -> '02')
+				// TODO: move this to separate function
+				let time = currentTimer.duration.map(value => {
+					let strVal = String(value);
+					return (strVal.length === 1) ? '0' + strVal : strVal;
+				});
+
 				// set name and time to currentTimer's ones
-				elems.mainTimer.name.textContent = currentTimer.name;
-				elems.mainTimer.time.textContent =
-					`${state.currentTimer.duration[0] || '00'}:
-					${state.currentTimer.duration[1] || '00'}`;
+				elems.mainTimer.name.textContent = name;
+				elems.mainTimer.time.textContent = `${time[0]}:${time[1]}`;
 
 			} else {
 				throw new Error(`Given timer doesn't exist.`);
