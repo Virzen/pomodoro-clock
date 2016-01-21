@@ -81,7 +81,11 @@
 
 		// methods
 		////////////////////////
-		let setCurrentTimer = function (timerId, callback) {
+		let decrementDuration = function (durArr) {
+
+		};
+
+		let setCurrentTimer = function (timerId, callback = renderMainTimer) {
 			// TODO: validate timerId
 			let timerIdNum = parseInt(timerId, 10);
 			let currentTimer = data.timers.find(timer => timer.id === timerIdNum);
@@ -94,21 +98,47 @@
 			}
 		};
 
-		let startTimer = function (timerId = data.currentTimerId) {
-
+		let stopTimer = function () {
+			// stop current timer by clearing its interval
+			clearInterval(data.currentTimerInterval);
 		};
 
-		let stopTimer = function (timerId = data.currentTimerId) {
+		let startTimer = function (timerId, callback = renderMainTimer) {
+			let currentTimer = (timerId) ?
+					data.timers.find(timer => timer.id === timerId) :
+					data.currentTimer;
 
+			// TODO: validate duration array
+
+			data.currentTimerInterval = setInterval(() => {
+				if (!decrementDuration(currentTimer.duration)) {
+					stopTimer();
+				}
+				else {
+					if (callback) {
+						callback();
+					}
+				}
+			}, 1000);
 		};
 
-		let resetTimer = function (timerId = data.currentTimerId) {
+		let resetTimer = function (timerId = data.currentTimerId, callback = renderMainTimer) {
+			stopTimer();
 
+			// find prototype of the current timer by id
+			let currentTimerProto = data.timers.find(timer => timer.id === timerId);
+
+			// set current timer's duration to its protoype's one
+			data.currentTimer.duration = currentTimerProto.duration;
+
+			if (callback) {
+				callback();
+			}
 		};
 
 		let renderMainTimer = function (timerId = data.currentTimerId) {
 			// search for timer object with given id
-			let currentTimer = currentTimer ||
+			let currentTimer = data.currentTimer ||
 					data.timers.find(timer => timer.id === timerId);
 
 			if (currentTimer) {
@@ -119,9 +149,10 @@
 					${currentTimer.duration[1] || '00'}`;
 
 			} else {
-				// display error
-				// TODO: throw error
-				console.error(`Timer with given id doesn't exist.`);
+				throw {
+					name: 'Error',
+					message: `Given timer doesn't exist.`
+				};
 			}
 		};
 
@@ -167,13 +198,13 @@
 			// its data-timer-id as timer's id
 			elems.timers.forEach(timer => {
 				timer.addEventListener('click', ev => {
-					setCurrentTimer(ev.target.dataset.timerId, renderMainTimer);
+					setCurrentTimer(ev.target.dataset.timerId);
 				});
 			});
 
 			// set default timer as current one and trigger initial rendering
 			// of main timer
-			setCurrentTimer(0, renderMainTimer)
+			setCurrentTimer(0);
 
 		};
 
