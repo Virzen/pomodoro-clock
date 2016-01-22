@@ -327,9 +327,15 @@
 			});
 
 			// attach event listeners to clock controls
-			elems.buttons.start.addEventListener('click', () => {startTimer();}, false);
-			elems.buttons.stop.addEventListener('click', () => {stopTimer();}, false);
-			elems.buttons.reset.addEventListener('click', () => {resetTimer();}, false);
+			elems.buttons.start.addEventListener('click', () => {
+				state.timers[state.currentTimerId].start(renderMainTimer);
+			}, false);
+			elems.buttons.stop.addEventListener('click', () => {
+				state.timers[state.currentTimerId].stop(renderMainTimer);
+			}, false);
+			elems.buttons.reset.addEventListener('click', () => {
+				state.timers[state.currentTimerId].reset(renderMainTimer);
+			}, false);
 
 			// set default timer as current one and trigger initial rendering
 			// of main timer (default callback)
