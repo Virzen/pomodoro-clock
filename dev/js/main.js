@@ -2,43 +2,41 @@
 	'use strict';
 
 	// Helper functions and polyfills
-	helpers: {
-		// ES6 `Array.from` polyfill
-		if (!Array.from) {
-			Array.from = function (pseudoArray) {
-				return Array.prototype.slice.call(pseudoArray);
-			};
-		}
-
-		// ES6 `Array.prototype.find` polyfill
-		if (!Array.prototype.find) {
-			Array.prototype.find = function (filterFunc) {
-				return this.filter(filterFunc)[0];
-			};
-		}
-
-		// Universal query selector
-		var $ = function (selector, root = document) {
-			if (selector) {
-				let elements = root.querySelectorAll(selector);
-				return (elements.length === 1) ?
-				elements[0] :
-				Array.from(elements);
-			}
-			else {
-				return null;
-			}
-		};
-
-		var isFunction = function (value) {
-			if (value && typeof value === 'function') {
-				return true;
-			}
-			else {
-				return false;
-			}
+	// ES6 `Array.from` polyfill
+	if (!Array.from) {
+		Array.from = function (pseudoArray) {
+			return Array.prototype.slice.call(pseudoArray);
 		};
 	}
+
+	// ES6 `Array.prototype.find` polyfill
+	if (!Array.prototype.find) {
+		Array.prototype.find = function (filterFunc) {
+			return this.filter(filterFunc)[0];
+		};
+	}
+
+	// Universal query selector
+	var $ = function (selector, root = document) {
+		if (selector) {
+			let elements = root.querySelectorAll(selector);
+			return (elements.length === 1) ?
+			elements[0] :
+			Array.from(elements);
+		}
+		else {
+			return null;
+		}
+	};
+
+	var isFunction = function (value) {
+		if (value && typeof value === 'function') {
+			return true;
+		}
+		else {
+			return false;
+		}
+	};
 
 	// Timer object contructor
 	// Tt attaches few methods and properties to objects from model, making
@@ -298,7 +296,6 @@
 		let signalizeTimerFinish = function () {
 			elems.mainTimer.sound.play();
 		};
-
 
 
 		let init = function () {
