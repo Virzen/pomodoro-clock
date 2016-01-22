@@ -323,13 +323,16 @@
 
 			// Attach event listeners to clock controls
 			elems.buttons.start.addEventListener('click', () => {
-				state.timers[state.currentTimerId].start(renderMainTimer, signalizeTimerFinish);
+				state.timers[state.currentTimerId]
+					.start(renderMainTimer, signalizeTimerFinish);
 			}, false);
 			elems.buttons.stop.addEventListener('click', () => {
-				state.timers[state.currentTimerId].stop(renderMainTimer);
+				state.timers[state.currentTimerId]
+					.stop(renderMainTimer);
 			}, false);
 			elems.buttons.reset.addEventListener('click', () => {
-				state.timers[state.currentTimerId].reset(renderMainTimer);
+				state.timers[state.currentTimerId]
+					.reset(renderMainTimer);
 			}, false);
 
 			// set default timer as current one and trigger initial rendering
