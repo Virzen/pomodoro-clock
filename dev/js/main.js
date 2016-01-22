@@ -294,9 +294,9 @@
 
 
 
-		// TODO: Implement real signalization for timer end
-		// possibly with some sound effect
-		let signalizeTimerEnd = function () {
+		// Play sound effect on timer finish
+		// Sound is stored in html audio element
+		let signalizeTimerFinish = function () {
 			elems.mainTimer.sound.play();
 		};
 
@@ -323,7 +323,7 @@
 
 			// Attach event listeners to clock controls
 			elems.buttons.start.addEventListener('click', () => {
-				state.timers[state.currentTimerId].start(renderMainTimer, signalizeTimerEnd);
+				state.timers[state.currentTimerId].start(renderMainTimer, signalizeTimerFinish);
 			}, false);
 			elems.buttons.stop.addEventListener('click', () => {
 				state.timers[state.currentTimerId].stop(renderMainTimer);
