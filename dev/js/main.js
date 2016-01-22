@@ -203,7 +203,8 @@
 		// Tt might synchronize raw data with model
 		// It is initialized in init function
 		let state = {
-			timers: []
+			timers: [],
+			currentTimerId: 0
 		};
 
 
@@ -229,38 +230,28 @@
 		};
 
 
-		let setCurrentTimer = function (timerId, callback = renderMainTimer) {
+
+
+
+
+
+
+
+
+		let setCurrentTimer = function (timerId, callback) {
 			// TODO: validate timerId
 			let timerIdNum = parseInt(timerId, 10);
-			let currentTimer = data.timers.find(timer => timer.id === timerIdNum);
 
-			// copy timer object to state object
-			state.currentTimer = Object.assign({}, currentTimer);
-
-			// in result of the operation above, `duration` array is assigned
-			// instead of copied, so `state.currentTimer.duration` contains
-			// just a reference to the `currentTimer.duration`
-			// this behaviour is undesirable, so the line below overrides
-			// the referenced array to a copied one
-			state.currentTimer.duration = Array.from(currentTimer.duration);
+			state.currentTimerId = timerIdNum;
 
 			if (isFunction(callback)) {
 				callback();
 			}
 		};
 
-
-
-
-
-
-
-		// view
-		//////////////////////////
-		let renderMainTimer = function (timerId = state.currentTimer.id) {
+		let renderMainTimer = function (timerId = state.currentTimerId) {
 			// use current timer or search for timer object with given id
-			let currentTimer = state.currentTimer ||
-					data.timers.find(timer => timer.id === timerId);
+			let currentTimer = state.timers[timerId];
 
 			if (currentTimer) {
 				let name = currentTimer.name;
@@ -276,20 +267,20 @@
 				// set name and time to currentTimer's ones
 				elems.mainTimer.name.textContent = name;
 				elems.mainTimer.time.textContent = `${time[0]}:${time[1]}`;
-
 			} else {
 				throw new Error(`Given timer doesn't exist.`);
 			}
 		};
 
-		let renderTimersListItem = function (item) {
+
+		let renderTimersListItem = function (item, index) {
 			// create dom elements
 			let li = doc.createElement('li');
 			let button = doc.createElement('button');
 
 			// add class and data value to the inner element
 			button.classList.add('timers-list__item');
-			button.dataset.timerId = item.id;
+			button.dataset.timerId = index;
 
 			// set inner element's text
 			// example: `pomodoro (25:00)`
@@ -309,6 +300,8 @@
 			state.timers.forEach(renderTimersListItem);
 		};
 
+
+
 		// TODO: Implement real signalization for timer end
 		let signalizeTimerEnd = function () {
 			alert('Timer ended!');
@@ -320,27 +313,27 @@
 				state.timers.push(timerConstr(timer));
 			});
 
-			// attach event listeners to clock controls
-			elems.buttons.start.addEventListener('click', () => {startTimer();}, false);
-			elems.buttons.stop.addEventListener('click', () => {stopTimer();}, false);
-			elems.buttons.reset.addEventListener('click', () => {resetTimer();}, false);
-
-			// render timers list from stored data
-			// it also adds each element to elems.timers, so it's necessary for
-			// the next step
+			// Render timers list from state
+			// Tt also adds each DOM element to elems.timers, so it's necessary
+			// for the next step
 			renderTimersList();
 
 			// call setCurrentTimer on click on timers list's element and use
 			// its data-timer-id as timer's id
 			elems.timers.forEach(timer => {
 				timer.addEventListener('click', ev => {
-					setCurrentTimer(ev.target.dataset.timerId);
+					setCurrentTimer(ev.target.dataset.timerId, renderMainTimer);
 				});
 			});
 
+			// attach event listeners to clock controls
+			elems.buttons.start.addEventListener('click', () => {startTimer();}, false);
+			elems.buttons.stop.addEventListener('click', () => {stopTimer();}, false);
+			elems.buttons.reset.addEventListener('click', () => {resetTimer();}, false);
+
 			// set default timer as current one and trigger initial rendering
 			// of main timer (default callback)
-			setCurrentTimer(0);
+			setCurrentTimer(0, renderMainTimer);
 
 		};
 
@@ -350,7 +343,7 @@
 		return {
 			data: data,
 			elems: elems,
-			timer: timer,
+			timer: timerConstr,
 			init: init,
 		};
 	}());
