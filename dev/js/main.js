@@ -345,11 +345,7 @@
 
 
 		// public part
-		////////////////////////
 		return {
-			data: data,
-			elems: elems,
-			timer: timerConstr,
 			init: init,
 		};
 	}());
