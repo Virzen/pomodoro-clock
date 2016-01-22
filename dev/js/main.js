@@ -68,6 +68,13 @@
 		let timer = function (spec) {
 			let that = {};
 
+			// Validate object properties
+			let hasDurationNonNumberValues = spec.duration.some(value =>
+				typeof value !== 'number');
+			if (hasDurationNonNumberValues) {
+				throw new Error(`Given object has invalid values.`)
+			}
+
 			// Object methods declaration
 			// They will be attached to output object later
 			// See: 'revealing module pattern'
@@ -101,11 +108,28 @@
 				return false;
 			};
 
+			// Decrements duration of timer each second
+			// Sets `interval` property on object it is called from
+			// On each decrement it calls given callback
+			let startTimer = function (callback) {
+				this.interval = setInterval(() => {
+					if (!this.decrementDuration()) {
+						this.end();
+						console.log(this);
+					}
+					else {
+						if (callback) {
+							callback();
+						}
+					}
+				}, 1000);
+			};
 
 
 			that.name = spec.name;
-			that.duration = spec.duration;
+			that.duration = Array.from(spec.duration);
 			that.decrementDuration = decrementDuration;
+			that.start = startTimer;
 
 
 
@@ -171,24 +195,6 @@
 			signalizeTimerEnd();
 		};
 
-		let startTimer = function (timerId, callback = renderMainTimer) {
-			// let currentTimer = (timerId) ?
-			// 		data.timers.find(timer => timer.id === timerId) :
-			// 		state.currentTimer;
-
-			// TODO: validate duration array
-
-			state.currentTimer.interval = setInterval(() => {
-				if (!decrementDuration(state.currentTimer.duration)) {
-					endTimer();
-				}
-				else {
-					if (callback) {
-						callback();
-					}
-				}
-			}, 10);
-		};
 
 		let resetTimer = function (timerId = state.currentTimer.id, callback = renderMainTimer) {
 			stopTimer();
