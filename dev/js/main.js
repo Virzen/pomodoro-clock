@@ -219,6 +219,7 @@
 			mainTimer: {
 				name: $('.timer__name', mainTimer),
 				time: $('.timer__time', mainTimer),
+				sound: $('.timer__sound', mainTimer),
 			},
 			buttons: {
 				start: $('.start-button', appBody),
@@ -227,14 +228,6 @@
 			},
 			timers: [],
 		};
-
-
-
-
-
-
-
-
 
 
 		let setCurrentTimer = function (timerId, callback) {
@@ -302,9 +295,12 @@
 
 
 		// TODO: Implement real signalization for timer end
+		// possibly with some sound effect
 		let signalizeTimerEnd = function () {
-			alert('Timer ended!');
+			elems.mainTimer.sound.play();
 		};
+
+
 
 		let init = function () {
 			// initialize state
@@ -327,7 +323,7 @@
 
 			// Attach event listeners to clock controls
 			elems.buttons.start.addEventListener('click', () => {
-				state.timers[state.currentTimerId].start(renderMainTimer);
+				state.timers[state.currentTimerId].start(renderMainTimer, signalizeTimerEnd);
 			}, false);
 			elems.buttons.stop.addEventListener('click', () => {
 				state.timers[state.currentTimerId].stop(renderMainTimer);
