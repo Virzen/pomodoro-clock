@@ -109,7 +109,6 @@
 					if (isFunction(intervalCallback)) {
 						intervalCallback();
 					}
-					console.log('timer tick');
 				}
 			}, 10);
 		};
