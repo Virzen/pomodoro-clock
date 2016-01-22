@@ -44,7 +44,7 @@
 	// Tt attaches few methods and properties to objects from model, making
 	// it easier to operate application
 	// It is called in init function on all timers in model
-	let timer = function (spec) {
+	let timerConstr = function (spec) {
 		let that = {};
 		let name = spec.name;
 		let duration = Array.from(spec.duration);
@@ -202,9 +202,9 @@
 		// That might mean objects from data with some added methods
 		// Tt might synchronize raw data with model
 		// It is initialized in init function
-		let state = {};
-
-
+		let state = {
+			timers: []
+		};
 
 
 		// DOM elements
@@ -227,9 +227,6 @@
 			},
 			timers: [],
 		};
-
-		// controller
-		////////////////////////
 
 
 		let setCurrentTimer = function (timerId, callback = renderMainTimer) {
@@ -309,7 +306,7 @@
 		};
 
 		let renderTimersList = function () {
-			data.timers.forEach(renderTimersListItem);
+			state.timers.forEach(renderTimersListItem);
 		};
 
 		// TODO: Implement real signalization for timer end
@@ -318,6 +315,11 @@
 		};
 
 		let init = function () {
+			// initialize state
+			data.timers.forEach(timer => {
+				state.timers.push(timerConstr(timer));
+			});
+
 			// attach event listeners to clock controls
 			elems.buttons.start.addEventListener('click', () => {startTimer();}, false);
 			elems.buttons.stop.addEventListener('click', () => {stopTimer();}, false);
