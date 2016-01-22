@@ -241,6 +241,7 @@
 			}
 		};
 
+
 		let renderMainTimer = function (timerId = state.currentTimerId) {
 			// Use current timer or search for timer object with given id
 			let currentTimer = state.timers[timerId];
@@ -263,7 +264,6 @@
 				throw new Error(`Given timer doesn't exist.`);
 			}
 		};
-
 
 		let renderTimersListItem = function (item, index) {
 			// Create dom elements
@@ -291,7 +291,6 @@
 		let renderTimersList = function () {
 			state.timers.forEach(renderTimersListItem);
 		};
-
 
 
 		// Play sound effect on timer finish
