@@ -100,7 +100,7 @@
 			}, 1000);
 		};
 
-		// Stop timer by clearing its interval and calls given callback
+		// Stops timer by clearing its interval and executes callback afterwards
 		let stopTimer = function (callback) {
 			if (interval) {
 				clearInterval(interval);
@@ -111,15 +111,19 @@
 			}
 		};
 
-		
-		let resetTimer = function (timerId = state.currentTimer.id, callback = renderMainTimer) {
+		// Stops timer and resets it by setting duration value back to the
+		// initial one, defined at the creation time
+		// Executes callback (if any) afterwards
+		let resetTimer = function (callback) {
 			stopTimer();
 
-			// find prototype of the current timer by id
-			let currentTimerProto = data.timers.find(timer => timer.id === timerId);
-
-			// set current timer's duration to its protoype's one
-			state.currentTimer.duration = Array.from(currentTimerProto.duration);
+			// Set initial duration as the current one
+			// It is important to note that initial duration is being cloned
+			// instead of being simply assigned. It has to be since assignement
+			// would create reference to the initial value. That would cause any
+			// change to the current duration be reflected in initial one,
+			// rendering it unusable.
+			duration = Array.from(initialDuration);
 
 			if (callback) {
 				callback();
@@ -137,6 +141,7 @@
 		that.decrementDuration = decrementDuration;
 		that.start = startTimer;
 		that.stop = stopTimer;
+		that.reset = resetTimer;
 
 
 
