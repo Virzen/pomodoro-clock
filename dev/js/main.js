@@ -165,7 +165,6 @@
 				return duration;
 			}
 		};
-		that.decrementDuration = decrementDuration;
 		that.start = startTimer;
 		that.stop = stopTimer;
 		that.reset = resetTimer;
