@@ -2,7 +2,6 @@
 	'use strict';
 
 	// Helper functions and polyfills
-	let $;
 	helpers: {
 		// ES6 `Array.from` polyfill
 		if (!Array.from) {
@@ -19,7 +18,7 @@
 		}
 
 		// universal query selector
-		$ = function (selector, root = document) {
+		var $ = function (selector, root = document) {
 			if (selector) {
 				let elements = root.querySelectorAll(selector);
 				return (elements.length === 1) ?
@@ -28,6 +27,15 @@
 			}
 			else {
 				return null;
+			}
+		};
+
+		var isFunction = function (value) {
+			if (value && typeof value === 'function') {
+				return true;
+			}
+			else {
+				return false;
 			}
 		};
 	}
