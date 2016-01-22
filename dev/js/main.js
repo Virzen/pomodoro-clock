@@ -32,6 +32,118 @@
 		};
 	}
 
+	// Timer object contructor
+	// Tt attaches few methods and properties to objects from model, making
+	// it easier to operate application
+	// It is called in init function on all timers in model
+	let timer = function (spec) {
+		let that = {};
+		let name = spec.name;
+		let duration = Array.from(spec.duration);
+		let initialDuration = Array.from(spec.duration);
+		let interval = 0;
+
+		// Validate object properties
+		let hasDurationNonNumberValues = spec.duration.some(value =>
+			typeof value !== 'number');
+		if (hasDurationNonNumberValues) {
+			throw new Error(`Given object has invalid values.`)
+		}
+
+		// Object methods declaration
+		// They will be attached to output object later
+		// See: 'revealing module pattern'
+
+		// Decrements timer's duration by one second at a time
+		let decrementDuration = function () {
+			// reverse array for easier access
+			let arr = duration.reverse();
+			let len = arr.length;
+
+			// TODO: validate durArr
+
+			// iterate through values in array
+			for (let i = 0; i < len; i++) {
+				// if current value (secs, mins, hours etc.) can be
+				// lowered, do it and return
+				if (arr[i] > 0) {
+					arr[i] -= 1;
+					duration = arr.reverse();
+					return true;
+				}
+				// if it can't be lowered, see if the next one can
+				// if so, set current one to 59 and let the loop decrement
+				// next one in the next step
+				else if (arr[i + 1] && arr[i + 1] > 0) {
+					arr[i] = 59;
+				}
+			}
+
+			// this means no value was lowered, none of the values is > 0
+			return false;
+		};
+
+		// Decrements duration of timer each second
+		// Sets `interval` property on object it is called from
+		// On each decrement it calls given callback
+		let startTimer = function (callback) {
+			interval = setInterval(() => {
+				if (!decrementDuration()) {
+					end();
+				}
+				else {
+					if (callback) {
+						callback();
+					}
+					console.log('test');
+				}
+			}, 1000);
+		};
+
+		// Stop timer by clearing its interval and calls given callback
+		let stopTimer = function (callback) {
+			if (interval) {
+				clearInterval(interval);
+			}
+
+			if (callback) {
+				callback();
+			}
+		};
+
+		
+		let resetTimer = function (timerId = state.currentTimer.id, callback = renderMainTimer) {
+			stopTimer();
+
+			// find prototype of the current timer by id
+			let currentTimerProto = data.timers.find(timer => timer.id === timerId);
+
+			// set current timer's duration to its protoype's one
+			state.currentTimer.duration = Array.from(currentTimerProto.duration);
+
+			if (callback) {
+				callback();
+			}
+		};
+
+		that = {
+			get name() {
+				return name;
+			},
+			get duration() {
+				return duration;
+			}
+		};
+		that.decrementDuration = decrementDuration;
+		that.start = startTimer;
+		that.stop = stopTimer;
+
+
+
+		return that;
+	};
+
+
 	// application's singleton
 	let app = (function () {
 		// Spp's model
@@ -61,91 +173,6 @@
 		// It is initialized in init function
 		let state = {};
 
-		// Timer object contructor
-		// Tt attaches few methods and properties to objects from model, making
-		// it easier to operate application
-		// It is called in init function on all timers in model
-		let timer = function (spec) {
-			let that = {};
-
-			// Validate object properties
-			let hasDurationNonNumberValues = spec.duration.some(value =>
-				typeof value !== 'number');
-			if (hasDurationNonNumberValues) {
-				throw new Error(`Given object has invalid values.`)
-			}
-
-			// Object methods declaration
-			// They will be attached to output object later
-			// See: 'revealing module pattern'
-
-			// Decrements timer's duration by one second at a time
-			let decrementDuration = function () {
-				// reverse array for easier access
-				let arr = this.duration.reverse();
-				let len = arr.length;
-
-				// TODO: validate durArr
-
-				// iterate through values in array
-				for (let i = 0; i < len; i++) {
-					// if current value (secs, mins, hours etc.) can be
-					// lowered, do it and return
-					if (arr[i] > 0) {
-						arr[i] -= 1;
-						this.duration = arr.reverse();
-						return true;
-					}
-					// if it can't be lowered, see if the next one can
-					// if so, set current one to 59 and let the loop decrement
-					// next one in the next step
-					else if (arr[i + 1] && arr[i + 1] > 0) {
-						arr[i] = 59;
-					}
-				}
-
-				// this means no value was lowered, none of the values is > 0
-				return false;
-			};
-
-			// Decrements duration of timer each second
-			// Sets `interval` property on object it is called from
-			// On each decrement it calls given callback
-			let startTimer = function (callback) {
-				this.interval = setInterval(() => {
-					if (!this.decrementDuration()) {
-						this.end();
-						console.log(this);
-					}
-					else {
-						if (callback) {
-							callback();
-						}
-					}
-				}, 1000);
-			};
-
-			// Stop timer by clearing its interval and calls given callback
-			let stopTimer = function (callback) {
-				if (this.interval) {
-					clearInterval(this.interval);
-				}
-
-				if (callback) {
-					callback();
-				}
-			};
-
-			that.name = spec.name;
-			that.duration = Array.from(spec.duration);
-			that.decrementDuration = decrementDuration;
-			that.start = startTimer;
-			that.stop = stopTimer;
-
-
-
-			return that;
-		};
 
 
 
@@ -201,19 +228,7 @@
 		};
 
 
-		let resetTimer = function (timerId = state.currentTimer.id, callback = renderMainTimer) {
-			stopTimer();
 
-			// find prototype of the current timer by id
-			let currentTimerProto = data.timers.find(timer => timer.id === timerId);
-
-			// set current timer's duration to its protoype's one
-			state.currentTimer.duration = Array.from(currentTimerProto.duration);
-
-			if (callback) {
-				callback();
-			}
-		};
 
 		// view
 		//////////////////////////
