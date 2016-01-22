@@ -17,7 +17,7 @@
 			};
 		}
 
-		// universal query selector
+		// Universal query selector
 		var $ = function (selector, root = document) {
 			if (selector) {
 				let elements = root.querySelectorAll(selector);
@@ -250,13 +250,13 @@
 		};
 
 		let renderMainTimer = function (timerId = state.currentTimerId) {
-			// use current timer or search for timer object with given id
+			// Use current timer or search for timer object with given id
 			let currentTimer = state.timers[timerId];
 
 			if (currentTimer) {
 				let name = currentTimer.name;
 
-				// turn numbers into strings and make all of them at least
+				// Turn numbers into strings and make all of them at least
 				// 2 digits long (e. g. 2 -> '02')
 				// TODO: move this to separate function
 				let time = currentTimer.duration.map(value => {
@@ -264,7 +264,7 @@
 					return (strVal.length === 1) ? '0' + strVal : strVal;
 				});
 
-				// set name and time to currentTimer's ones
+				// Set name and time to currentTimer's ones
 				elems.mainTimer.name.textContent = name;
 				elems.mainTimer.time.textContent = `${time[0]}:${time[1]}`;
 			} else {
@@ -274,25 +274,25 @@
 
 
 		let renderTimersListItem = function (item, index) {
-			// create dom elements
+			// Create dom elements
 			let li = doc.createElement('li');
 			let button = doc.createElement('button');
 
-			// add class and data value to the inner element
+			// Add class and data value to the inner element
 			button.classList.add('timers-list__item');
 			button.dataset.timerId = index;
 
-			// set inner element's text
-			// example: `pomodoro (25:00)`
+			// Set inner element's text
+			// Example: `pomodoro (25:00)`
 			button.textContent = `${item.name} (${item.duration[0] || '00'}:${item.duration[1] || '00'})`;
 
-			// append inner element to the outer one, and outer one to the
+			// Append inner element to the outer one, and outer one to the
 			// container
 			li.appendChild(button);
 			timersList.appendChild(li);
 
-			// add button to the elems object
-			// FIXME: refactor this to be callback passed as argument
+			// Add button to the elems object
+			// FIXME: Refactor this to be callback passed as argument
 			elems.timers.push(button);
 		};
 
@@ -318,7 +318,7 @@
 			// for the next step
 			renderTimersList();
 
-			// call setCurrentTimer on click on timers list's element and use
+			// Call setCurrentTimer on click on timers list's element and use
 			// its data-timer-id as timer's id
 			elems.timers.forEach(timer => {
 				timer.addEventListener('click', ev => {
@@ -326,7 +326,7 @@
 				});
 			});
 
-			// attach event listeners to clock controls
+			// Attach event listeners to clock controls
 			elems.buttons.start.addEventListener('click', () => {
 				state.timers[state.currentTimerId].start(renderMainTimer);
 			}, false);
@@ -344,7 +344,7 @@
 		};
 
 
-		// public part
+		// Public interface
 		return {
 			init: init,
 		};
