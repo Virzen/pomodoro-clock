@@ -93,17 +93,23 @@
 
 		// Decrements duration of timer each second
 		// Sets `interval` property on object it is called from
-		// On each decrement it calls given callback
-		let startTimer = function (callback) {
+		// Executes first callback each second and passes the second one to
+		// function fired at timer's finish
+		let startTimer = function (intervalCallback, endCallback) {
 			interval = setInterval(() => {
 				if (!decrementDuration()) {
-					endTimer();
+					if (isFunction(endCallback)) {
+						finishTimer(endCallback);
+					}
+					else {
+						finishTimer();
+					}
 				}
 				else {
-					if (callback && typeof callback === 'function') {
-						callback();
+					if (isFunction(intervalCallback)) {
+						intervalCallback();
 					}
-					console.log('test');
+					console.log('timer tick');
 				}
 			}, 1000);
 		};
@@ -114,7 +120,7 @@
 				clearInterval(interval);
 			}
 
-			if (callback && typeof callback === 'function') {
+			if (isFunction(callback)) {
 				callback();
 			}
 		};
@@ -133,7 +139,7 @@
 			// rendering it unusable.
 			duration = Array.from(initialDuration);
 
-			if (callback && typeof callback === 'function') {
+			if (isFunction(callback)) {
 				callback();
 			}
 		};
@@ -229,7 +235,7 @@
 			// the referenced array to a copied one
 			state.currentTimer.duration = Array.from(currentTimer.duration);
 
-			if (callback && typeof callback === 'function') {
+			if (isFunction(callback)) {
 				callback();
 			}
 		};
