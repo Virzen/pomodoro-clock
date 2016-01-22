@@ -47,7 +47,7 @@
 		let hasDurationNonNumberValues = spec.duration.some(value =>
 			typeof value !== 'number');
 		if (hasDurationNonNumberValues) {
-			throw new Error(`Given object has invalid values.`)
+			throw new Error(`Given object has invalid values.`);
 		}
 
 		// Object methods declaration
@@ -89,10 +89,10 @@
 		let startTimer = function (callback) {
 			interval = setInterval(() => {
 				if (!decrementDuration()) {
-					end();
+					endTimer();
 				}
 				else {
-					if (callback) {
+					if (callback && typeof callback === 'function') {
 						callback();
 					}
 					console.log('test');
@@ -106,7 +106,7 @@
 				clearInterval(interval);
 			}
 
-			if (callback) {
+			if (callback && typeof callback === 'function') {
 				callback();
 			}
 		};
@@ -125,7 +125,7 @@
 			// rendering it unusable.
 			duration = Array.from(initialDuration);
 
-			if (callback) {
+			if (callback && typeof callback === 'function') {
 				callback();
 			}
 		};
@@ -221,16 +221,13 @@
 			// the referenced array to a copied one
 			state.currentTimer.duration = Array.from(currentTimer.duration);
 
-			if (callback) {
+			if (callback && typeof callback === 'function') {
 				callback();
 			}
 		};
 
 
-		let endTimer = function () {
-			stopTimer();
-			signalizeTimerEnd();
-		};
+
 
 
 
