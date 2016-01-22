@@ -176,7 +176,7 @@
 
 	// application's singleton
 	let app = (function () {
-		// Spp's model
+		// App's model
 		// An idea of this object is to be as independent as possible
 		// It might be fetched through ajax or localStorage, so it should be
 		// JSON compatible (e. g. no methods)
