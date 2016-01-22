@@ -125,11 +125,22 @@
 				}, 1000);
 			};
 
+			// Stop timer by clearing its interval and calls given callback
+			let stopTimer = function (callback) {
+				if (this.interval) {
+					clearInterval(this.interval);
+				}
+
+				if (callback) {
+					callback();
+				}
+			};
 
 			that.name = spec.name;
 			that.duration = Array.from(spec.duration);
 			that.decrementDuration = decrementDuration;
 			that.start = startTimer;
+			that.stop = stopTimer;
 
 
 
@@ -183,12 +194,6 @@
 			}
 		};
 
-		// stop current timer by clearing its interval
-		let stopTimer = function () {
-			if (state.currentTimer.interval) {
-				clearInterval(state.currentTimer.interval);
-			}
-		};
 
 		let endTimer = function () {
 			stopTimer();
