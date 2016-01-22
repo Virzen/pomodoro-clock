@@ -111,7 +111,7 @@
 					}
 					console.log('timer tick');
 				}
-			}, 1000);
+			}, 10);
 		};
 
 		// Stops timer by clearing its interval and executes callback afterwards
@@ -144,6 +144,19 @@
 			}
 		};
 
+		// Stops timer, optionally passing callback
+		// Executed when timer reaches 00:00
+		let finishTimer = function (callback) {
+			if (isFunction(callback)) {
+				stopTimer(callback);
+			}
+			else {
+				stopTimer();
+			}
+		};
+
+
+		// Assign public methods to the new object
 		that = {
 			get name() {
 				return name;
@@ -158,7 +171,7 @@
 		that.reset = resetTimer;
 
 
-
+		// Return the new object
 		return that;
 	};
 
