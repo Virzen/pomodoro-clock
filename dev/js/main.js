@@ -29,8 +29,8 @@
 		}
 	};
 
-	var isFunction = function (value) {
-		if (value && typeof value === 'function') {
+	var is = function (value, expectedType) {
+		if (value !== undefined && typeof value === expectedType) {
 			return true;
 		}
 		else {
@@ -43,12 +43,6 @@
 	// it easier to operate application
 	// It is called in init function on all timers in model
 	let timerConstr = function (spec) {
-		let that = {};
-		let name = spec.name;
-		let duration = Array.from(spec.duration);
-		let initialDuration = Array.from(spec.duration);
-		let interval = 0;
-
 		// Validate object properties
 		let hasDurationNonNumberValues = spec.duration.some(value =>
 			typeof value !== 'number');
@@ -56,37 +50,60 @@
 			throw new Error(`Given object has invalid values.`);
 		}
 
+		let that = {};
+		let name = spec.name;
+		let duration = Array.from(spec.duration).map(val => parseInt(val, 10));
+		let initialDuration = Array.from(spec.duration);
+		let interval = 0;
+
 		// Object methods declaration
-		// They will be attached to output object later
+		// They will be attached to the new object later
 		// See: 'revealing module pattern'
 
-		// Decrements timer's duration by one second at a time
-		let decrementDuration = function () {
-			// reverse array for easier access
-			let arr = duration.reverse();
-			let len = arr.length;
-
-			// TODO: validate durArr
-
-			// iterate through values in array
-			for (let i = 0; i < len; i++) {
-				// if current value (secs, mins, hours etc.) can be
-				// lowered, do it and return
-				if (arr[i] > 0) {
-					arr[i] -= 1;
-					duration = arr.reverse();
-					return true;
-				}
-				// if it can't be lowered, see if the next one can
-				// if so, set current one to 59 and let the loop decrement
-				// next one in the next step
-				else if (arr[i + 1] && arr[i + 1] > 0) {
-					arr[i] = 59;
-				}
+		// diff - number of seconds to add (may be negative number)
+		let changeDurationBy = function changeDurationBy(diff, array) {
+			// validate input
+			if (!is(diff, 'number')) {
+				throw new Error(`Incorrect time difference: ${diff}`);
 			}
 
-			// this means no value was lowered, none of the values is > 0
-			return false;
+			// pick given array or private duration array
+			array = (array && Array.from(array))
+				|| duration;
+			let length = array.length;
+			// apply diff to the last elements of the array and store
+			// the result for later verification
+			let appliedDiff = array[length - 1] + diff;
+
+			// test if applying diff produces correct value
+			// (i. e. between 0 and 59 inclusive)
+			if (appliedDiff >= 0 && appliedDiff < 60) {
+				// apply diff to array
+				array[length - 1] += diff;
+				return array;
+			}
+			// test if next (second last) element exists and is a number
+			else if (is(array[length - 2], 'number')) {
+				// apply difference
+				let modDiff = diff % 60;
+				array[length - 1] += (modDiff < 0) ? 60 + modDiff : modDiff;
+				// return result of calling this function recursively with
+				// diff divided by 60 (conversion to the next time value, e. g.
+				// seconds -> minutes) and array without last element,
+				// concatenated with differentiated value
+				let result = changeDurationBy(Math.round(diff / 60) - 1, array.slice(0, length - 1));
+				if (result) {
+					return result.concat(array[length - 1]);
+				}
+				else {
+					return result;
+				}
+			}
+			else {
+				// this means the diff couldn't have been fully applied to the
+				// array
+				return null;
+			}
 		};
 
 		// Decrements duration of timer each second
@@ -95,20 +112,23 @@
 		// function fired at timer's finish
 		let startTimer = function (intervalCallback, endCallback) {
 			interval = setInterval(() => {
-				if (!decrementDuration()) {
-					if (isFunction(endCallback)) {
+				let changedDuration = changeDurationBy(-1);
+
+				if (changedDuration) {
+					duration = changedDuration;
+					if (is(intervalCallback, 'function')) {
+						intervalCallback();
+					}
+				}
+				else {
+					if (is(endCallback, 'function')) {
 						finishTimer(endCallback);
 					}
 					else {
 						finishTimer();
 					}
 				}
-				else {
-					if (isFunction(intervalCallback)) {
-						intervalCallback();
-					}
-				}
-			}, 10);
+			}, 1000);
 		};
 
 		// Stops timer by clearing its interval and executes callback afterwards
@@ -117,7 +137,7 @@
 				clearInterval(interval);
 			}
 
-			if (isFunction(callback)) {
+			if (is(callback, 'function')) {
 				callback();
 			}
 		};
@@ -136,7 +156,7 @@
 			// rendering it unusable.
 			duration = Array.from(initialDuration);
 
-			if (isFunction(callback)) {
+			if (is(callback, 'function')) {
 				callback();
 			}
 		};
@@ -144,7 +164,7 @@
 		// Stops timer, optionally passing callback
 		// Executed when timer reaches 00:00
 		let finishTimer = function (callback) {
-			if (isFunction(callback)) {
+			if (is(callback, 'function')) {
 				stopTimer(callback);
 			}
 			else {
@@ -165,6 +185,7 @@
 		that.start = startTimer;
 		that.stop = stopTimer;
 		that.reset = resetTimer;
+		that.changeDurationBy = changeDurationBy;
 
 
 		// Return the new object
@@ -224,7 +245,11 @@
 				stop: $('.stop-button', appBody),
 				reset: $('.reset-button', appBody),
 			},
-			timers: [],
+			timers: {
+				selectButtons: [],
+				plusButtons: [],
+				minusButtons: [],
+			},
 		};
 
 
@@ -234,7 +259,7 @@
 
 			state.currentTimerId = timerIdNum;
 
-			if (isFunction(callback)) {
+			if (is(callback, 'function')) {
 				callback();
 			}
 		};
@@ -266,24 +291,24 @@
 		let renderTimersListItem = function (item, index) {
 			// Create dom elements
 			let li = doc.createElement('li');
-			let button = doc.createElement('button');
+			let selectButton = doc.createElement('button');
 
-			// Add class and data value to the inner element
-			button.classList.add('timers-list__item');
-			button.dataset.timerId = index;
+			// Add class and data value to the inner elements
+			selectButton.classList.add('timers-list__select-button');
+			selectButton.dataset.timerId = index;
 
-			// Set inner element's text
+			// Set inner elements' text
 			// Example: `pomodoro (25:00)`
-			button.textContent = `${item.name} (${item.duration[0] || '00'}:${item.duration[1] || '00'})`;
+			selectButton.textContent = `${item.name} (${item.duration[0] || '00'}:${item.duration[1] || '00'})`;
 
-			// Append inner element to the outer one, and outer one to the
+			// Append inner elements to the outer one, and outer one to the
 			// container
-			li.appendChild(button);
+			li.appendChild(selectButton);
 			timersList.appendChild(li);
 
 			// Add button to the elems object
 			// FIXME: Refactor this to be callback passed as argument
-			elems.timers.push(button);
+			elems.timers.selectButtons.push(selectButton);
 		};
 
 		let renderTimersList = function () {
@@ -291,8 +316,7 @@
 		};
 
 
-		// Play sound effect on timer finish
-		// Sound is stored in html audio element
+		// Executed when timer reaches 00:00
 		let signalizeTimerFinish = function () {
 			elems.mainTimer.sound.play();
 		};
@@ -311,7 +335,7 @@
 
 			// Call setCurrentTimer on click on timers list's element and use
 			// its data-timer-id as timer's id
-			elems.timers.forEach(timer => {
+			elems.timers.selectButtons.forEach(timer => {
 				timer.addEventListener('click', ev => {
 					setCurrentTimer(ev.target.dataset.timerId, renderMainTimer);
 				});
@@ -340,6 +364,8 @@
 
 		// Public interface
 		return {
+			timer: timerConstr,
+			data: data,
 			init: init,
 		};
 	}());
