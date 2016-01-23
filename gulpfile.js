@@ -50,9 +50,10 @@ var config = {
 	},
 	browserSync: {
 		// create static file server and serve files from baseDir
+		online: false,
 		server: {
-			baseDir: './dist'
-		}
+			baseDir: './dist',
+		},
 		// alternatively you can use proxy (if you have file server already
 		// or need back-end)
 		// remove (or comment-out) `server` property above, uncomment
