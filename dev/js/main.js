@@ -304,31 +304,30 @@
 			}
 		};
 
+		// FIXME: reimplement rendering list
 		let renderTimersListItem = function (item, index) {
-			// Create dom elements
-			let li = doc.createElement('li');
-			let selectButton = doc.createElement('button');
+			let createdButton;
+			const name = item.name;
+			const duration = Array.from(item.duration).map(value => toDigits(value, 2));
+			const itemTemplate = `
+				<li>
+					<button type="button"
+						class="timers-list__select-button"
+						data-timer-id="${index}"
+					>
+						<span class="name">${name}</span>
+						<span class="duration">${duration[0]}:${duration[1]}</span>
+					</button>
+				</li>
+			`;
 
-			// Add class and data value to the inner elements
-			selectButton.classList.add('timers-list__select-button');
-			selectButton.dataset.timerId = index;
-
-			// Set inner elements' text
-			// Example: `pomodoro (25:00)`
-			selectButton.textContent = `${item.name} (${item.duration[0] || '00'}:${item.duration[1] || '00'})`;
-
-			// Append inner elements to the outer one, and outer one to the
-			// container
-			li.appendChild(selectButton);
-			timersList.appendChild(li);
-
-			// Add button to the elems object
-			// FIXME: Refactor this to be callback passed as argument
-			elems.timers.selectButtons.push(selectButton);
+			timersList.insertAdjacentHTML('beforeend', itemTemplate);
 		};
 
 		let renderTimersList = function () {
 			state.timers.forEach(renderTimersListItem);
+
+			elems.timers.selectButtons = $('.timers-list__select-button', timersList);
 		};
 
 
