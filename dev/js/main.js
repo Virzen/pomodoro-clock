@@ -306,7 +306,6 @@
 
 		// FIXME: reimplement rendering list
 		let renderTimersListItem = function (item, index) {
-			let createdButton;
 			const name = item.name;
 			const duration = Array.from(item.duration).map(value => toDigits(value, 2));
 			const itemTemplate = `
