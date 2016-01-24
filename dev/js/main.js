@@ -17,12 +17,12 @@
 	}
 
 	// Universal query selector
-	var $ = function (selector, root = document) {
+	const $ = function (selector, root = document) {
 		if (selector) {
 			let elements = root.querySelectorAll(selector);
 			return (elements.length === 1) ?
-			elements[0] :
-			Array.from(elements);
+				elements[0] :
+				Array.from(elements);
 		}
 		else {
 			return null;
@@ -30,7 +30,7 @@
 	};
 
 	// Tests given value against expected type
-	var is = function (value, expectedType) {
+	const is = function (value, expectedType) {
 		if (value !== undefined && typeof value === expectedType) {
 			return true;
 		}
@@ -58,7 +58,7 @@
 	// Tt attaches few methods and properties to objects from model, making
 	// it easier to operate application
 	// It is called in init function on all timers in model
-	let timerConstr = function (spec) {
+	const timerConstr = function (spec) {
 		// Validate object properties
 		let hasDurationNonNumberValues = spec.duration.some(value =>
 			typeof value !== 'number');
@@ -69,7 +69,7 @@
 		let that = {};
 		let name = spec.name;
 		let duration = Array.from(spec.duration).map(val => parseInt(val, 10));
-		let initialDuration = Array.from(spec.duration);
+		const initialDuration = Array.from(spec.duration);
 		let interval = 0;
 
 		// Object methods declaration
@@ -77,7 +77,7 @@
 		// See: 'revealing module pattern'
 
 		// diff - number of seconds to add (may be negative number)
-		let changeDurationBy = function changeDurationBy(diff, array) {
+		const changeDurationBy = function changeDurationBy(diff, array) {
 			// validate input
 			if (!is(diff, 'number')) {
 				throw new Error(`Incorrect time difference: ${diff}`);
@@ -126,7 +126,7 @@
 		// Sets `interval` property on object it is called from
 		// Executes first callback each second and passes the second one to
 		// function fired at timer's finish
-		let startTimer = function (intervalCallback, endCallback) {
+		const startTimer = function (intervalCallback, endCallback) {
 			interval = setInterval(() => {
 				let changedDuration = changeDurationBy(-1);
 
@@ -148,7 +148,7 @@
 		};
 
 		// Stops timer by clearing its interval and executes callback afterwards
-		let stopTimer = function (callback) {
+		const stopTimer = function (callback) {
 			if (interval) {
 				clearInterval(interval);
 			}
@@ -161,7 +161,7 @@
 		// Stops timer and resets it by setting duration value back to the
 		// initial one, defined at the creation time
 		// Executes callback (if any) afterwards
-		let resetTimer = function (callback) {
+		const resetTimer = function (callback) {
 			stopTimer();
 
 			// Set initial duration as the current one
@@ -179,7 +179,7 @@
 
 		// Stops timer, optionally passing callback
 		// Executed when timer reaches 00:00
-		let finishTimer = function (callback) {
+		const finishTimer = function (callback) {
 			if (is(callback, 'function')) {
 				stopTimer(callback);
 			}
@@ -210,12 +210,12 @@
 
 
 	// application's singleton
-	let app = (function () {
+	const app = (function () {
 		// App's model
 		// An idea of this object is to be as independent as possible
 		// It might be fetched through ajax or localStorage, so it should be
 		// JSON compatible (e. g. no methods)
-		let data = {
+		const data = {
 			timers: [
 				{
 					name: 'pomodoro',
@@ -236,7 +236,7 @@
 		// That might mean objects from data with some added methods
 		// Tt might synchronize raw data with model
 		// It is initialized in init function
-		let state = {
+		const state = {
 			timers: [],
 			currentTimerId: 0
 		};
@@ -245,12 +245,12 @@
 		// DOM elements
 		////////////////////////
 		// Containers
-		let appBody = $('.app-body');
-		let mainTimer = $('.timer', appBody);
-		let timersList = $('.timers-list', appBody);
+		const appBody = $('.app-body');
+		const mainTimer = $('.timer', appBody);
+		const timersList = $('.timers-list', appBody);
 
 		// Elements
-		let elems = {
+		const elems = {
 			mainTimer: {
 				name: $('.timer__name', mainTimer),
 				time: $('.timer__time', mainTimer),
@@ -269,7 +269,7 @@
 		};
 
 
-		let setCurrentTimer = function (timerId, callback) {
+		const setCurrentTimer = function (timerId, callback) {
 			// TODO: validate timerId
 			let timerIdNum = parseInt(timerId, 10);
 
@@ -281,20 +281,13 @@
 		};
 
 
-		let renderMainTimer = function (timerId = state.currentTimerId) {
+		const renderMainTimer = function (timerId = state.currentTimerId) {
 			// Use current timer or search for timer object with given id
-			let currentTimer = state.timers[timerId];
+			const currentTimer = state.timers[timerId];
 
 			if (currentTimer) {
-				let name = currentTimer.name;
-
-				// Turn numbers into strings and make all of them at least
-				// 2 digits long (e. g. 2 -> '02')
-				// TODO: move this to separate function
-				let time = currentTimer.duration.map(value => {
-					let strVal = String(value);
-					return (strVal.length === 1) ? '0' + strVal : strVal;
-				});
+				const name = currentTimer.name;
+				const time = currentTimer.duration.map(value => toDigits(value));
 
 				// Set name and time to currentTimer's ones
 				elems.mainTimer.name.textContent = name;
@@ -304,8 +297,7 @@
 			}
 		};
 
-		// FIXME: reimplement rendering list
-		let renderTimersListItem = function (item, index) {
+		const renderTimersListItem = function (item, index) {
 			const name = item.name;
 			const duration = Array.from(item.duration).map(value => toDigits(value, 2));
 			const itemTemplate = `
@@ -323,20 +315,19 @@
 			timersList.insertAdjacentHTML('beforeend', itemTemplate);
 		};
 
-		let renderTimersList = function () {
+		const renderTimersList = function () {
 			state.timers.forEach(renderTimersListItem);
-
 			elems.timers.selectButtons = $('.timers-list__select-button', timersList);
 		};
 
 
 		// Executed when timer reaches 00:00
-		let signalizeTimerFinish = function () {
+		const signalizeTimerFinish = function () {
 			elems.mainTimer.sound.play();
 		};
 
 
-		let init = function () {
+		const init = function () {
 			// initialize state
 			data.timers.forEach(timer => {
 				state.timers.push(timerConstr(timer));
@@ -386,5 +377,5 @@
 
 	win.app = app;
 })(document, window);
-
+/*global app*/
 app.init();
