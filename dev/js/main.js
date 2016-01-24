@@ -69,7 +69,7 @@
 		let that = {};
 		let name = spec.name;
 		let duration = Array.from(spec.duration).map(val => parseInt(val, 10));
-		const initialDuration = Array.from(spec.duration);
+		let initialDuration = Array.from(spec.duration);
 		let interval = 0;
 
 		// Object methods declaration
@@ -196,6 +196,12 @@
 			},
 			get duration() {
 				return duration;
+			},
+			get initialDuration() {
+				return initialDuration;
+			},
+			set initialDuration(value) {
+				initialDuration = value;
 			}
 		};
 		that.start = startTimer;
@@ -260,12 +266,10 @@
 				start: $('.start-button', appBody),
 				stop: $('.stop-button', appBody),
 				reset: $('.reset-button', appBody),
+				plus: $('.plus-button', appBody),
+				minus: $('.minus-button', appBody),
 			},
-			timers: {
-				selectButtons: [],
-				plusButtons: [],
-				minusButtons: [],
-			},
+			timers: [],
 		};
 
 
@@ -299,7 +303,7 @@
 
 		const renderTimersListItem = function (item, index) {
 			const name = item.name;
-			const duration = Array.from(item.duration).map(value => toDigits(value, 2));
+			const duration = Array.from(item.initialDuration).map(value => toDigits(value, 2));
 			const itemTemplate = `
 				<li>
 					<button type="button"
@@ -316,8 +320,17 @@
 		};
 
 		const renderTimersList = function () {
+			timersList.innerHTML = '';
 			state.timers.forEach(renderTimersListItem);
-			elems.timers.selectButtons = $('.timers-list__select-button', timersList);
+			elems.timers = $('.timers-list__select-button', timersList);
+
+			// Call setCurrentTimer on click on timers list's element and use
+			// its data-timer-id as timer's id
+			elems.timers.forEach(timer => {
+				timer.addEventListener('click', ev => {
+					setCurrentTimer(ev.target.dataset.timerId, renderMainTimer);
+				});
+			});
 		};
 
 
@@ -338,27 +351,35 @@
 			// for the next step
 			renderTimersList();
 
-			// Call setCurrentTimer on click on timers list's element and use
-			// its data-timer-id as timer's id
-			elems.timers.selectButtons.forEach(timer => {
-				timer.addEventListener('click', ev => {
-					setCurrentTimer(ev.target.dataset.timerId, renderMainTimer);
-				});
-			});
 
 			// Attach event listeners to clock controls
+			// TODO: refactor this mess
 			elems.buttons.start.addEventListener('click', () => {
 				state.timers[state.currentTimerId]
 					.start(renderMainTimer, signalizeTimerFinish);
 			}, false);
 			elems.buttons.stop.addEventListener('click', () => {
-				state.timers[state.currentTimerId]
-					.stop(renderMainTimer);
+				state.timers[state.currentTimerId].stop();
+				renderMainTimer();
 			}, false);
 			elems.buttons.reset.addEventListener('click', () => {
-				state.timers[state.currentTimerId]
-					.reset(renderMainTimer);
+				state.timers[state.currentTimerId].reset();
+				renderMainTimer();
 			}, false);
+			elems.buttons.plus.addEventListener('click', () => {
+				const currentTimer = state.timers[state.currentTimerId];
+				currentTimer.initialDuration = currentTimer.changeDurationBy(60, currentTimer.initialDuration);
+				currentTimer.reset();
+				renderMainTimer();
+				renderTimersList();
+			});
+			elems.buttons.minus.addEventListener('click', () => {
+				const currentTimer = state.timers[state.currentTimerId];
+				currentTimer.initialDuration = currentTimer.changeDurationBy(-60, currentTimer.initialDuration);
+				currentTimer.reset();
+				renderMainTimer();
+				renderTimersList();
+			});
 
 			// set default timer as current one and trigger initial rendering
 			// of main timer (default callback)
@@ -370,7 +391,7 @@
 		// Public interface
 		return {
 			timer: timerConstr,
-			data: data,
+			state: state,
 			init: init,
 		};
 	}());
