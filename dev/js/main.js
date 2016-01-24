@@ -107,7 +107,7 @@
 				// diff divided by 60 (conversion to the next time value, e. g.
 				// seconds -> minutes) and array without last element,
 				// concatenated with differentiated value
-				let result = changeDurationBy(Math.round(diff / 60) - 1, array.slice(0, length - 1));
+				let result = changeDurationBy(Math.floor(diff / 60), array.slice(0, length - 1));
 				if (result) {
 					return result.concat(array[length - 1]);
 				}
