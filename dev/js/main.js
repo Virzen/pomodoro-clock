@@ -29,12 +29,28 @@
 		}
 	};
 
+	// Tests given value against expected type
 	var is = function (value, expectedType) {
 		if (value !== undefined && typeof value === expectedType) {
 			return true;
 		}
 		else {
 			return false;
+		}
+	};
+
+	// Converts given value to string and prepends zeros at the beggining untill
+	// length in `digits` is achieved
+	// If nothing to prepend, returns string from given value
+	const toDigits = function toDigits(value, digits = 2) {
+		const strVal = String(value);
+		const len = strVal.length;
+
+		if (len >= digits) {
+			return strVal;
+		}
+		else {
+			return '0'.repeat(digits - len) + strVal;
 		}
 	};
 
