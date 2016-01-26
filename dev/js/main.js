@@ -16,6 +16,18 @@
 		};
 	}
 
+	// ES6 `String.prototype.repeat` polyfill
+	if (!String.prototype.repeat) {
+		String.prototype.repeat = function (times) {
+			let result = '';
+			for (let i = 0; i < times; i++) {
+				result += this;
+			}
+
+			return result;
+		};
+	}
+
 	// Universal query selector
 	const $ = function (selector, root = document) {
 		if (selector) {
