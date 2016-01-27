@@ -405,8 +405,6 @@
 
 		// Public interface
 		return {
-			timer: timerConstr,
-			state: state,
 			init: init,
 		};
 	}());
