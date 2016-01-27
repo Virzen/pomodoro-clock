@@ -320,7 +320,7 @@
 			const name = item.name;
 			const duration = Array.from(item.initialDuration).map(value => toDigits(value, 2));
 			const itemTemplate = `
-				<li>
+				<li class="timers-list__item">
 					<button type="button"
 						class="timers-list__select-button"
 						data-timer-id="${index}"
