@@ -1075,12 +1075,55 @@
 }
 
 body {
+	color: #333333;
+	text-align: center;
+	background-color: #BFBFBF;
+}
+
+body {
 	font-family: 'Lato', sans-serif;
 	font-size: 18px;
 	line-height: 1.618;
 }
 
 /* layout */
+.primary-heading {
+	font-weight: normal;
+}
+
 /* modules */
+.button {
+	color: inherit;
+	font-family: inherit;
+	padding: 1em;
+	border: none;
+	border-radius: 50%;
+	background-color: transparent;
+}
+
+.button:hover, .button:focus {
+	background-color: #7F7F7F;
+	cursor: pointer;
+}
+
+.button .fa {
+	margin-right: 0.5em;
+}
+
+.timer {
+	margin: 3em 0;
+}
+
+.timer__name {
+	font-size: 2em;
+	font-weight: bold;
+	margin: 0;
+}
+
+.timer__time {
+	font-size: 5em;
+	margin: 0;
+}
+
 /* pages */
 /* themes */
