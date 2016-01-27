@@ -1,1 +1,19 @@
 // main: ../main.scss
+.button {
+	color: inherit;
+	font-family: inherit;
+
+	padding: 1em;
+	border: none;
+	border-radius: 50%;
+	background-color: transparent;
+
+	&:hover, &:focus {
+		background-color: #7F7F7F;
+		cursor: pointer;
+	}
+
+	& .fa {
+		margin-right: 0.5em;
+	}
+}
