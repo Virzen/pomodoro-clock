@@ -1,19 +1,31 @@
 // main: ../main.scss
 .button {
+	font-size: 1em;
 	color: inherit;
 	font-family: inherit;
 
 	padding: 1em;
 	border: none;
-	border-radius: 50%;
 	background-color: transparent;
 
+	transition: transform 0.2s;
+
 	&:hover, &:focus {
-		background-color: #7F7F7F;
+		background-color: #333333;
 		cursor: pointer;
+
+		transform: translate(0, -0.1em);
 	}
 
 	& .fa {
 		margin-right: 0.5em;
 	}
+}
+
+.start-button, .stop-button, .reset-button {
+	font-weight: bold;
+}
+
+.plus-button, .minus-button {
+	font-size: 0.8em;
 }
