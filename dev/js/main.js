@@ -322,7 +322,7 @@
 			const itemTemplate = `
 				<li class="timers-list__item">
 					<button type="button"
-						class="timers-list__select-button"
+						class="timers-list__select-button button"
 						data-timer-id="${index}"
 					>
 						<span class="name">${name}</span>
