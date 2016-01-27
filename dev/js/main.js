@@ -82,7 +82,7 @@
 		let name = spec.name;
 		let duration = Array.from(spec.duration).map(val => parseInt(val, 10));
 		let initialDuration = Array.from(spec.duration);
-		let interval = 0;
+		let interval = null;
 
 		// Object methods declaration
 		// They will be attached to the new object later
@@ -139,30 +139,33 @@
 		// Executes first callback each second and passes the second one to
 		// function fired at timer's finish
 		const startTimer = function (intervalCallback, endCallback) {
-			interval = setInterval(() => {
-				let changedDuration = changeDurationBy(-1);
+			if (!interval) {
+				interval = setInterval(() => {
+					let changedDuration = changeDurationBy(-1);
 
-				if (changedDuration) {
-					duration = changedDuration;
-					if (is(intervalCallback, 'function')) {
-						intervalCallback();
-					}
-				}
-				else {
-					if (is(endCallback, 'function')) {
-						finishTimer(endCallback);
+					if (changedDuration) {
+						duration = changedDuration;
+						if (is(intervalCallback, 'function')) {
+							intervalCallback();
+						}
 					}
 					else {
-						finishTimer();
+						if (is(endCallback, 'function')) {
+							finishTimer(endCallback);
+						}
+						else {
+							finishTimer();
+						}
 					}
-				}
-			}, 1000);
+				}, 1000);
+			}
 		};
 
 		// Stops timer by clearing its interval and executes callback afterwards
 		const stopTimer = function (callback) {
 			if (interval) {
 				clearInterval(interval);
+				interval = null;
 			}
 
 			if (is(callback, 'function')) {
